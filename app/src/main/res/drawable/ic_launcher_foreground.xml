@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono provisional (flor de lis simplificada). Sustituir por el logo real del grupo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,22 C48,32 46,42 50,52 C44,48 38,48 34,52 C32,58 38,64 46,64 C50,64 52,62 52,62 L52,74 L44,74 L44,80 L64,80 L64,74 L56,74 L56,62 C56,62 58,64 62,64 C70,64 76,58 74,52 C70,48 64,48 58,52 C62,42 60,32 54,22 Z" />
+</vector>

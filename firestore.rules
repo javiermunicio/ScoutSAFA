@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// Reglas de seguridad de Firestore. Publícalas desde la consola de Firebase
+// (Firestore Database > Reglas) o con `firebase deploy --only firestore:rules`.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isScouter() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'SCOUTER';
+    }
+
+    // Cada persona lee y edita solo su perfil. Nadie puede cambiarse el rol:
+    // los scouters se promocionan a mano (campo role = "SCOUTER") desde la consola.
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isScouter());
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'FAMILIA';
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role;
+    }
+
+    // Todos los usuarios con sesión leen; solo los scouters crean, editan o borran.
+    match /activities/{id} {
+      allow read: if signedIn();
+      allow write: if isScouter();
+    }
+
+    match /announcements/{id} {
+      allow read: if signedIn();
+      allow write: if isScouter();
+    }
+
+    // Cada persona gestiona solo su propia confirmación de asistencia.
+    match /attendances/{id} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.userId == request.auth.uid
+        && id == request.resource.data.activityId + '_' + request.auth.uid;
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}
